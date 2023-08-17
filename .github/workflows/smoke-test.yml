@@ -17,17 +17,17 @@ jobs:
         id: curl_output
         run: |
           apt update && apt install -y jq
-          curl -X 'POST'   'http://52.18.147.196:8185/classify?text=Caleb'   -H 'accept: application/json'   -d '' | jq
-          echo "::set-output name=output::$curl_output"
+          curl -X 'POST' 'http://52.18.147.196:8185/classify?text=Caleb' -H 'accept: application/json' -d '' | jq > smoke-test.json
 
       - name: Send some mail
-        uses: wadeww/send-email-action@master
+        uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           port: 465
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
-          subject: Workflow finished
-          body: ${{ steps.curl_output.outputs.output }}
+          subject: Workflow Finished
+          body: Smoke Test
+          attachments: smoke-test.json
           to: poku.ackom@st.vvu.edu.gh
-          from: Trestle
+          from: Caleb Poku Ackom
