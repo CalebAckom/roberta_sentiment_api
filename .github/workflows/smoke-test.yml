@@ -1,0 +1,33 @@
+name: Send Email on Curl Command
+
+on:
+  push:
+    branches:
+      - smoke-test
+
+jobs:
+  send_email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Smoke Test
+        id: curl_output
+        run: |
+          apt update && apt install -y jq
+          curl -X 'POST'   'http://52.18.147.196:8185/classify?text=Caleb'   -H 'accept: application/json'   -d '' | jq
+          echo "::set-output name=output::$curl_output"
+
+      - name: Send some mail
+        uses: wadeww/send-email-action@master
+        with:
+          server_address: smtp.gmail.com
+          port: 465
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Workflow finished
+          body: ${{ steps.curl_output.outputs.output }}
+          to: poku.ackom@st.vvu.edu.gh
+          from: Trestle
